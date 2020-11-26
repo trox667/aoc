@@ -1,5 +1,6 @@
 fn main() {
     println!("{}", part1());
+    println!("{}", part2());
 }
 
 fn read_input() -> Vec<usize> {
@@ -75,6 +76,24 @@ fn part1() -> usize {
     program[1] = 12;
     program[2] = 2;
     run(&mut program, 0, 0)
+}
+
+fn part2() -> usize {
+    let program = read_input();
+    let target = 19690720;
+    let mut result = 0;
+    'outer: for noun in 0..100 {
+        for verb in 0..100 {
+            let mut program = program.clone();
+            program[1] = noun;
+            program[2] = verb;
+            if run(&mut program, 0, 0) == target {
+                result = 100 * noun + verb;
+                break 'outer;
+            }
+        }
+    }
+    result
 }
 
 mod test {
