@@ -22,25 +22,36 @@ def gen_input(input, n):
     return input + str(n)
 
 
-def gen_hash(input, gen_number):
+def gen_hash(input, gen_number, check):
     n = gen_number.next()
     h = hashlib.md5(gen_input(input, n).encode('ascii'))
-    if five_zeroes(h.hexdigest()):
+    if check(h.hexdigest()):
         return n
     else:
         return 0
 
 
-def run(input):
+def run(input, check):
     gen_number = GenNumber()
-    n = gen_hash(input, gen_number)
+    n = gen_hash(input, gen_number, check)
     while n == 0:
-        n = gen_hash(input, gen_number)
+        n = gen_hash(input, gen_number, check)
     return n
 
 
 def part1():
-    print(run('ckczppom'))
+    print(run('ckczppom', five_zeroes))
+
+
+def six_zeroes(hex):
+    if hex[0:6] == '000000':
+        return True
+    else:
+        return False
+
+
+def part2():
+    print(run('ckczppom', six_zeroes))
 
 
 class Part1(unittest.TestCase):
@@ -59,10 +70,11 @@ class Part1(unittest.TestCase):
         self.assertEqual(gen_input('abc', gen.next()), 'abc2')
 
     def test_hash(self):
-        self.assertEqual(run('abcdef'), 609043)
-        self.assertEqual(run('pqrstuv'), 1048970)
+        self.assertEqual(run('abcdef', five_zeroes), 609043)
+        self.assertEqual(run('pqrstuv', five_zeroes), 1048970)
 
 
 if __name__ == '__main__':
     part1()
+    part2()
     unittest.main()
