@@ -40,6 +40,25 @@ def part1():
         print(run(input.read()))
 
 
+def run2(path):
+    path = list(path)
+    path_a = path[::2]
+    path.pop(0)
+    path_b = path[::2]
+    data = TraceData()
+    for i in path_a:
+        move(data, direction(i))
+    data.position = (0, 0)
+    for i in path_b:
+        move(data, direction(i))
+    return len(data.trace)
+
+
+def part2():
+    with open('input03') as input:
+        print(run2(input.read()))
+
+
 class Test1(unittest.TestCase):
     def test_move(self):
         data = TraceData()
@@ -59,6 +78,14 @@ class Test1(unittest.TestCase):
         self.assertEqual(run('^v^v^v^v^v'), 2)
 
 
+class Test2(unittest.TestCase):
+    def test_run2(self):
+        self.assertEqual(run2('^v'), 3)
+        self.assertEqual(run2('^>v<'), 3)
+        self.assertEqual(run2('^v^v^v^v^v'), 11)
+
+
 if __name__ == '__main__':
     part1()
+    part2()
     unittest.main()
