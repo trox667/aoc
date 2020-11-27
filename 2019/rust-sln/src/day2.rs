@@ -96,7 +96,7 @@ fn part2() -> usize {
     result
 }
 
-mod test {
+mod tests {
     use super::*;
 
     #[test]
