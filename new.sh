@@ -23,8 +23,20 @@ then
         cp "templates/python.py" "$2/python/day$3.py"
         echo "$2/python/day$3.py"
     fi
+elif [ "$1" == "rust" ]
+then
+    if [ -r "$2/rust-sln/src/day$3.rs" ]
+    then
+        echo "error file already exists"
+    else
+        cp "templates/rust.rs" "$2/rust-sln/src/day$3.rs"
+        echo -e "[[bin]]\nname = \"day$3\"\ntarget = \"src/day$3.rs\"" >> "$2/rust-sln/Cargo.toml"
+        echo "$2/rust-sln/src/day$3.rs"
+    fi
 else
     echo "unknown language"
     echo "useage:"
     echo "new.sh [language] yyyy dd"
 fi
+
+
