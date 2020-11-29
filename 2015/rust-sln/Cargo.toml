@@ -14,4 +14,4 @@ path = "src/day01.rs"
 
 [[bin]]
 name = "day02"
-target = "src/day02.rs"
+path = "src/day02.rs"
