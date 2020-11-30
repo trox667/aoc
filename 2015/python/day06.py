@@ -14,8 +14,8 @@ def light(grid, position, state):
 def light_grid(grid, position_start, position_end, state):
     (psx, psy) = position_start
     (pex, pey) = position_end
-    for x in range(psx, pex+1):
-        for y in range(psy, pey+1):
+    for x in range(psx, pex + 1):
+        for y in range(psy, pey + 1):
             light(grid, (x, y), state)
 
 
@@ -41,10 +41,6 @@ def parse_instruction(instruction):
         return ((int(sx), int(sy)), (int(ex), int(ey)), state)
 
 
-def run():
-    pass
-
-
 def part1():
     grid = {}
     for instruction in read_input():
@@ -54,12 +50,40 @@ def part1():
     print(lights_enabled(grid))
 
 
-def run2():
-    pass
+def light2(grid, position, state):
+    if grid.get(position) == None:
+        grid[position] = 0
+
+    if state == 'toggle':
+        grid[position] = grid[position] + 2
+    elif state == 'on':
+        grid[position] = grid[position] + 1
+    elif state == 'off':
+        grid[position] = max(0, grid[position] - 1)
+
+
+def light_grid2(grid, position_start, position_end, state):
+    (psx, psy) = position_start
+    (pex, pey) = position_end
+    for x in range(psx, pex + 1):
+        for y in range(psy, pey + 1):
+            light2(grid, (x, y), state)
+
+
+def lights_enabled2(grid):
+    count = 0
+    for i in grid:
+        count = count + grid[i]
+    return count
 
 
 def part2():
-    pass
+    grid = {}
+    for instruction in read_input():
+        start, end, state = instruction
+        light_grid2(grid, start, end, state)
+
+    print(lights_enabled2(grid))
 
 
 def read_input():
@@ -109,14 +133,14 @@ class TestPart1(unittest.TestCase):
         self.assertEqual(lights_enabled(grid), 1000 * 1000 - 1000 - 4)
 
     def test_parse_instruction(self):
-        self.assertEqual(parse_instruction(
-            'turn on 0,0 through 999,999'), ((0, 0), (999, 999), 'on'))
+        self.assertEqual(parse_instruction('turn on 0,0 through 999,999'),
+                         ((0, 0), (999, 999), 'on'))
 
-        self.assertEqual(parse_instruction(
-            'toggle 0,0 through 999,0'), ((0, 0), (999, 0), 'toggle'))
+        self.assertEqual(parse_instruction('toggle 0,0 through 999,0'),
+                         ((0, 0), (999, 0), 'toggle'))
 
-        self.assertEqual(parse_instruction(
-            'turn off 499,499 through 500,500'), ((499, 499), (500, 500), 'off'))
+        self.assertEqual(parse_instruction('turn off 499,499 through 500,500'),
+                         ((499, 499), (500, 500), 'off'))
 
     def test_run(self):
         pass
@@ -124,9 +148,19 @@ class TestPart1(unittest.TestCase):
 
 class TestPart2(unittest.TestCase):
     def test_run2(self):
-        pass
+        grid = dict()
+        light_grid2(grid, (0, 0), (0, 0), 'on')
+        self.assertEqual(grid.get((0, 0)), 1)
+        light_grid2(grid, (0, 0), (0, 0), 'off')
+        self.assertEqual(grid.get((0, 0)), 0)
+        grid = dict()
+        light_grid2(grid, (0, 0), (999, 999), 'toggle')
+        for x in range(0, 1000):
+            for y in range(0, 1000):
+                self.assertEqual(grid[(x, y)], 2)
 
 
 if __name__ == '__main__':
     part1()
+    part2()
     unittest.main()
