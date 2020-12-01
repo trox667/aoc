@@ -14,8 +14,7 @@ def is_2020(combinations):
 
 
 def run(items, size=2, compare_func=is_2020):
-    combinations = itertools.combinations(items, size)
-    for combination in combinations:
+    for combination in itertools.combinations(items, size):
         if compare_func(combination):
             return functools.reduce(lambda x, y: x*y, combination)
     return 0
