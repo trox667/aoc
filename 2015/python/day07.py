@@ -1,5 +1,6 @@
 import unittest
 import ctypes
+import copy
 
 
 class Circuit:
@@ -64,7 +65,9 @@ def run(circuit):
         solved_key = ''
         for key in circuit.deps:
             deps = circuit.deps[key]
-            if all(i != None for i in [circuit.signals.get(d) for d in deps if not d.isnumeric()]):
+            if all(i != None for i in
+                   [circuit.signals.get(d) for d in deps
+                    if not d.isnumeric()]):
                 signals = [
                     signal
                     for signal in [circuit.signals.get(d) for d in deps]
@@ -108,7 +111,20 @@ def run2():
 
 
 def part2():
-    pass
+    circuit = Circuit()
+    with open('../inputs/input07') as input:
+        for i in input:
+            parse(circuit, i.strip())
+    circuit2 = copy.deepcopy(circuit)
+    run(circuit)
+    a = circuit.signals['a']
+    circuit2.signals['b'] = a
+    if 'b' in circuit2.ops:
+        del circuit2.ops['b']
+    if 'b' in circuit2.deps:
+        del circuit2.deps['b']
+    run(circuit2)
+    print(circuit2.signals['a'])
 
 
 def read_input():
@@ -183,4 +199,5 @@ class TestPart2(unittest.TestCase):
 
 if __name__ == '__main__':
     part1()
+    part2()
     unittest.main()
