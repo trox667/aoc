@@ -4,9 +4,10 @@ import re
 
 def parse(line):
     # use regex, credits to https://github.com/apaulheim :)
-    matches = re.match(r'(\d+)-(\d+) ([A-z]): ([A-z]+)', line)
+    matches = re.match(
+        r'(?P<min>\d+)-(?P<max>\d+) (?P<c>[A-z]): (?P<password>[A-z]+)', line)
     assert matches
-    return (matches.group(4), matches.group(3), (int(matches.group(1)), int(matches.group(2))))
+    return (matches.group('password'), matches.group('c'), (int(matches.group('min')), int(matches.group('max'))))
 
 
 def char_count(password, c):
