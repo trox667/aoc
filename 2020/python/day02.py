@@ -1,11 +1,12 @@
 import unittest
+import re
 
 
 def parse(line):
-    r, c, password = line.split(' ')
-    rs, re = r.split('-')
-    c, *tail = c.split(':')
-    return (password, c, (int(rs), int(re)))
+    # use regex, credits to https://github.com/apaulheim :)
+    matches = re.match(r'(\d+)-(\d+) ([A-z]): ([A-z]+)', line)
+    assert matches
+    return (matches.group(4), matches.group(3), (int(matches.group(1)), int(matches.group(2))))
 
 
 def char_count(password, c):
