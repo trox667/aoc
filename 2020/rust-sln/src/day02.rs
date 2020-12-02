@@ -1,3 +1,4 @@
+use regex::Regex;
 use std::error::Error;
 use std::fmt;
 use std::num::ParseIntError;
@@ -17,7 +18,7 @@ impl fmt::Display for ParseEntryError {
     }
 }
 impl From<ParseIntError> for ParseEntryError {
-    fn from(err: ParseIntError) -> ParseEntryError {
+    fn from(_err: ParseIntError) -> ParseEntryError {
         ParseEntryError
     }
 }
@@ -32,22 +33,24 @@ struct Entry {
 impl FromStr for Entry {
     type Err = ParseEntryError;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let tokens = s.split_whitespace().collect::<Vec<_>>();
-        if tokens.len() < 3 {
-            return Err(ParseEntryError);
+        let re = Regex::new(r"(?P<min>\d+)-(?P<max>\d+) (?P<c>[A-z]): (?P<password>[A-z]+)")
+            .expect("Could not create regex");
+        let mut entries = vec![];
+        for caps in re.captures_iter(s) {
+            entries.push(Entry {
+                password: caps["password"].to_string(),
+                range: (
+                    caps["min"].parse::<usize>().expect("Could not parse min"),
+                    caps["max"].parse::<usize>().expect("Could not parse max"),
+                ),
+                c: caps["c"].chars().nth(0).expect("Could not get a char"),
+            });
         }
-        let min_max = tokens[0].split("-").collect::<Vec<_>>();
-        let c = tokens[1].split(":").take(1).collect::<Vec<_>>();
-        let password = tokens[2];
-
-        let min = min_max[0].parse::<usize>()?;
-        let max = min_max[1].parse::<usize>()?;
-        let c = c[0].chars().next().unwrap();
-        Ok(Entry {
-            password: password.to_string(),
-            c,
-            range: (min, max),
-        })
+        if entries.len() > 0 {
+            Ok(entries.pop().expect("Entry could not be parsed"))
+        } else {
+            Err(ParseEntryError)
+        }
     }
 }
 
