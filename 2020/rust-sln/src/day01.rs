@@ -49,7 +49,7 @@ mod tests {
 
     #[test]
     fn test_run() {
-        assert_eq!(run(&vec![1721, 299], 2), 514579);
+        assert_eq!(run(&vec![1, 1721, 299], 2), 514579);
         assert_eq!(run(&vec![0, 1721, 2, 299], 2), 514579);
     }
 }
