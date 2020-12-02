@@ -12,45 +12,39 @@ def char_count(password, c):
     return password.count(c)
 
 
-def match_policy(password, c, occurences):
-    min_occ, max_occ = occurences
-    count = char_count(password, c)
-    return min_occ <= count <= max_occ
+def policy_min_max(password, c, min_max):
+    min_occ, max_occ = min_max
+    return min_occ <= char_count(password, c) <= max_occ
 
 
-def run(entries):
+def match_policy(entry, policy):
+    password, c, r = entry
+    return policy(password, c, r)
+
+
+def run(entries, policy):
     result = 0
     for entry in entries:
-        password, c, occurences = entry
-        if (match_policy(password, c, occurences)):
+        if (match_policy(entry, policy)):
             result += 1
     return result
 
 
 def part1():
-    print(run(read_input()))
+    print(run(read_input(), policy_min_max))
 
 
 def char_pos(password, c, pos):
     return password[pos - 1] == c
 
 
-def match_policy2(password, c, positions):
+def policy_position(password, c, positions):
     return char_pos(password, c, positions[0]) ^ char_pos(
         password, c, positions[1])
 
 
-def run2(entries):
-    result = 0
-    for entry in entries:
-        password, c, occurences = entry
-        if (match_policy2(password, c, occurences)):
-            result += 1
-    return result
-
-
 def part2():
-    print(run2(read_input()))
+    print(run(read_input(), policy_position))
 
 
 def read_input():
@@ -68,14 +62,15 @@ class TestPart1(unittest.TestCase):
         self.assertEqual(char_count('ccccccccc', 'c'), 9)
 
     def test_match_policy(self):
-        self.assertTrue(match_policy('abcde', 'a', (1, 3)))
-        self.assertFalse(match_policy('cdefg', 'b', (1, 3)))
-        self.assertTrue(match_policy('ccccccccc', 'c', (2, 9)))
+        self.assertTrue(match_policy(('abcde', 'a', (1, 3)), policy_min_max))
+        self.assertFalse(match_policy(('cdefg', 'b', (1, 3)), policy_min_max))
+        self.assertTrue(
+            match_policy(('ccccccccc', 'c', (2, 9)), policy_min_max))
 
     def test_run(self):
         self.assertEqual(
             run([('abcde', 'a', (1, 3)), ('cdefg', 'b', (1, 3)),
-                 ('ccccccccc', 'c', (2, 9))]), 2)
+                 ('ccccccccc', 'c', (2, 9))], policy_min_max), 2)
 
 
 class TestPart2(unittest.TestCase):
@@ -85,18 +80,18 @@ class TestPart2(unittest.TestCase):
         self.assertTrue(char_pos('ccccccccc', 'c', 2))
 
     def test_match_policy2(self):
-        self.assertTrue(match_policy2('abcde', 'a', (1, 3)))
-        self.assertFalse(match_policy2('cdefg', 'b', (1, 3)))
-        self.assertFalse(match_policy2('ccccccccc', 'c', (2, 9)))
+        self.assertTrue(match_policy(('abcde', 'a', (1, 3)), policy_position))
+        self.assertFalse(match_policy(('cdefg', 'b', (1, 3)), policy_position))
+        self.assertFalse(
+            match_policy(('ccccccccc', 'c', (2, 9)), policy_position))
 
     def test_run2(self):
         self.assertEqual(
-            run2([('abcde', 'a', (1, 3)), ('cdefg', 'b', (1, 3)),
-                  ('ccccccccc', 'c', (2, 9))]), 1)
+            run([('abcde', 'a', (1, 3)), ('cdefg', 'b', (1, 3)),
+                 ('ccccccccc', 'c', (2, 9))], policy_position), 1)
 
 
 if __name__ == '__main__':
     part1()
     part2()
     unittest.main()
-    pass
