@@ -10,23 +10,22 @@ class Grid:
     def add(self, entry):
         self.data.add(entry)
 
+    def add_row(self, y, line):
+        x = 0
+        for c in line:
+            if c == '#':
+                self.add((x, y))
+            x = x + 1
 
-def parse(grid: Grid, y, line):
-    x = 0
-    for c in line:
-        if c == '#':
-            grid.add((x, y))
-        x = x + 1
 
-
-def step(grid: Grid, position):
+def hit(grid: Grid, position):
     x, y = position
     return (x, y) in grid.data
 
 
-def update_position(columns, position, step_x=3, step_y=1):
+def update_position(max_x, position, step_x=3, step_y=1):
     x, y = position
-    return ((x + step_x) % columns, y + step_y)
+    return ((x + step_x) % max_x, y + step_y)
 
 
 def run(grid, step_x=3, step_y=1):
@@ -34,7 +33,7 @@ def run(grid, step_x=3, step_y=1):
     hits = 0
     while position[1] < grid.rows:
         position = update_position(grid.columns, position, step_x, step_y)
-        if step(grid, position):
+        if hit(grid, position):
             hits = hits + 1
     return hits
 
@@ -57,22 +56,22 @@ def read_input():
         grid = Grid(len(inputs[0]), len(inputs))
         y = 0
         for i in inputs:
-            parse(grid, y, i)
+            grid.add_row(y, i)
             y = y + 1
         return grid
 
 
 class TestPart1(unittest.TestCase):
-    def test_parse(self):
+    def test_add_row(self):
         grid = Grid(11, 1)
-        parse(grid, 0, '..##.......')
+        grid.add_row(0, '..##.......')
         self.assertEqual(grid.data, {(2, 0), (3, 0)})
 
     def test_step(self):
         grid = Grid(11, 3)
         grid.data = {(2, 0), (3, 0), (0, 1), (4, 1), (8, 1), (1, 2), (6, 2),
                      (9, 2)}
-        self.assertEqual(step(grid, (6, 2)), True)
+        self.assertEqual(hit(grid, (6, 2)), True)
 
     def test_update_position(self):
         self.assertEqual(update_position(11, (10, 0)), (2, 1))
@@ -95,7 +94,6 @@ class TestPart2(unittest.TestCase):
                      (6, 4), (9, 4)}
         self.assertEqual(run(grid, 1, 2), 1)
         self.assertEqual(run(grid, 7, 1), 2)
-        pass
 
 
 if __name__ == '__main__':
