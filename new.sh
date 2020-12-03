@@ -30,7 +30,7 @@ then
         echo "error file already exists"
     else
         cp "templates/rust.rs" "$2/rust-sln/src/day$3.rs"
-        echo -e "[[bin]]\nname = \"day$3\"\npath = \"src/day$3.rs\"" >> "$2/rust-sln/Cargo.toml"
+        echo -e "\n[[bin]]\nname = \"day$3\"\npath = \"src/day$3.rs\"" >> "$2/rust-sln/Cargo.toml"
         echo "$2/rust-sln/src/day$3.rs"
     fi
 else
