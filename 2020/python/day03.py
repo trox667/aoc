@@ -21,18 +21,12 @@ def parse(grid: Grid, y, line):
 
 def step(grid: Grid, position):
     x, y = position
-    if (x, y) in grid.data:
-        return True
-    return False
+    return (x, y) in grid.data
 
 
 def update_position(columns, position, step_x=3, step_y=1):
     x, y = position
-    new_x = x + step_x
-    new_y = y + step_y
-    if new_x >= columns:
-        return (new_x - columns, new_y)
-    return (new_x, new_y)
+    return ((x + step_x) % columns, y + step_y)
 
 
 def run(grid, step_x=3, step_y=1):
