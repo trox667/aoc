@@ -1,7 +1,17 @@
 import unittest
 
 
-def parse(grid: set, y, line):
+class Grid:
+    def __init__(self, columns, rows):
+        self.data = set()
+        self.rows = rows
+        self.columns = columns
+
+    def add(self, entry):
+        self.data.add(entry)
+
+
+def parse(grid: Grid, y, line):
     x = 0
     for c in line:
         if c == '#':
@@ -9,72 +19,66 @@ def parse(grid: set, y, line):
         x = x + 1
 
 
-def step(grid: set, position):
+def step(grid: Grid, position):
     x, y = position
-    hit = 0
-    if (x, y) in grid:
-        hit = hit + 1
-    return hit
+    if (x, y) in grid.data:
+        return True
+    return False
 
 
-def update_position(grid_length, position, step_x=3, step_y=1):
+def update_position(columns, position, step_x=3, step_y=1):
     x, y = position
-    if x + step_x >= grid_length:
-        return (x + step_x - grid_length, y + step_y)
-    return (x + step_x, y + step_y)
+    new_x = x + step_x
+    new_y = y + step_y
+    if new_x >= columns:
+        return (new_x - columns, new_y)
+    return (new_x, new_y)
 
 
-def run(grid_length, grid_height, grid, step_x=3, step_y=1):
+def run(grid, step_x=3, step_y=1):
     position = (0, 0)
     hits = 0
-    while position[1] < grid_height:
-        position = update_position(grid_length, position, step_x, step_y)
-        hits = hits + step(grid, position)
+    while position[1] < grid.rows:
+        position = update_position(grid.columns, position, step_x, step_y)
+        if step(grid, position):
+            hits = hits + 1
     return hits
 
 
 def part1():
-    grid_length, grid_height, grid = read_input()
-    print(run(grid_length, grid_height, grid))
-
-
-def run2():
-    pass
+    grid = read_input()
+    print(run(grid))
 
 
 def part2():
-    grid_length, grid_height, grid = read_input()
-    print(run(grid_length, grid_height, grid, 1, 1) *
-          run(grid_length, grid_height, grid) *
-          run(grid_length, grid_height, grid, 5, 1) *
-          run(grid_length, grid_height, grid, 7, 1) *
-          run(grid_length, grid_height, grid, 1, 2))
+    grid = read_input()
+    print(
+        run(grid, 1, 1) * run(grid) * run(grid, 5, 1) * run(grid, 7, 1) *
+        run(grid, 1, 2))
 
 
 def read_input():
     with open('../inputs/input03') as input:
-        grid = set()
-        grid_length = 0
-        grid_height = 0
         inputs = [i.strip() for i in input if not i.isspace()]
-        grid_height = len(inputs)
-        grid_length = len(inputs[0])
+        grid = Grid(len(inputs[0]), len(inputs))
         y = 0
         for i in inputs:
             parse(grid, y, i)
-            y = y+1
-        return (grid_length, grid_height, grid)
+            y = y + 1
+        return grid
 
 
 class TestPart1(unittest.TestCase):
     def test_parse(self):
-        grid = set()
+        grid = Grid(11, 1)
         parse(grid, 0, '..##.......')
-        self.assertEqual(grid, {(2, 0), (3, 0)})
+        self.assertEqual(grid.data, {(2, 0), (3, 0)})
 
     def test_step(self):
-        grid = {(2, 0), (3, 0), (0, 1), (4, 1), (8, 1), (1, 2), (6, 2), (9, 2)}
-        self.assertEqual(step(grid, (6, 2)), 1)
+        grid = Grid(11, 3)
+        grid.data = {(2, 0), (3, 0), (0, 1), (4, 1), (8, 1), (1, 2), (6, 2),
+                     (9, 2)}
+        self.assertEqual(step(grid, (6, 2)), True)
 
     def test_update_position(self):
         self.assertEqual(update_position(11, (10, 0)), (2, 1))
@@ -82,16 +86,21 @@ class TestPart1(unittest.TestCase):
         self.assertEqual(update_position(11, (8, 0)), (0, 1))
 
     def test_run(self):
-        grid = {(2, 0), (3, 0), (0, 1), (4, 1), (8, 1), (1, 2), (6, 2), (9, 2),
-                (2, 3), (4, 3), (8, 3), (10, 3), (1, 4), (5, 4), (6, 4), (9, 4)}
-        self.assertEqual(run(11, 5, grid), 2)
+        grid = Grid(11, 5)
+        grid.data = {(2, 0), (3, 0), (0, 1), (4, 1), (8, 1), (1, 2), (6, 2),
+                     (9, 2), (2, 3), (4, 3), (8, 3), (10, 3), (1, 4), (5, 4),
+                     (6, 4), (9, 4)}
+        self.assertEqual(run(grid), 2)
 
 
 class TestPart2(unittest.TestCase):
     def test_run(self):
-        grid = {(2, 0), (3, 0), (0, 1), (4, 1), (8, 1), (1, 2), (6, 2), (9, 2),
-                (2, 3), (4, 3), (8, 3), (10, 3), (1, 4), (5, 4), (6, 4), (9, 4)}
-        self.assertEqual(run(11, 5, grid, 1, 2), 1)
+        grid = Grid(11, 5)
+        grid.data = {(2, 0), (3, 0), (0, 1), (4, 1), (8, 1), (1, 2), (6, 2),
+                     (9, 2), (2, 3), (4, 3), (8, 3), (10, 3), (1, 4), (5, 4),
+                     (6, 4), (9, 4)}
+        self.assertEqual(run(grid, 1, 2), 1)
+        self.assertEqual(run(grid, 7, 1), 2)
         pass
 
 
