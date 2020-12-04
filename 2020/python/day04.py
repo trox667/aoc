@@ -4,32 +4,61 @@ import re
 
 def parse_passport(line):
     items = dict()
-    pairs = line.split(' ')
-    for pair in pairs:
+    for pair in line.split(' '):
         k, v = pair.split(':')
         items[k] = v
     return items
 
 
-def to_single_line(lines):
-    passports = list()
-    curr_str = ''
-    for line in lines:
-        if not line.isspace() and not len(line) == 0:
-            curr_str += line.strip() + ' '
-        else:
-            passports.append(curr_str.rstrip())
-            curr_str = ''
-    if len(curr_str) > 0:
-        passports.append(curr_str.rstrip())
-    return passports
+def to_passports(lines):
+    return [block.replace('\n', ' ').strip() for block in lines.split('\n\n')]
 
 
 def validate_passport(passport):
-    if 'byr' in passport and 'iyr' in passport and 'eyr' in passport and 'hgt' in passport and 'hcl' in passport and 'ecl' in passport and 'pid' in passport:
-        return True
+    validation_keys = {'byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid'}
+    return all(k in passport for k in validation_keys)
+
+
+def in_range(min, max, value):
+    return int(value) in range(min, max+1)
+
+
+def make_in_range(min, max): return lambda v: in_range(min, max, v)
+
+
+def match(pattern, value):
+    matches = re.match(pattern, value)
+    return matches and matches.group(1)
+
+
+hgt_map = {'cm': make_in_range(150, 193), 'in': make_in_range(59, 76)}
+
+
+def valid_byr(value): return in_range(1920, 2002, value)
+def valid_iyr(value): return in_range(2010, 2020, value)
+def valid_eyr(value): return in_range(2020, 2030, value)
+def valid_hcl(value): return match(r'#([0-9]|[a-f]){6}', value)
+def valid_ecl(value): return match(r'(amb|blu|brn|gry|grn|hzl|oth)', value)
+def valid_pid(value): return match(r'^(\d){9}$', value)
+
+
+def valid_hgt(value):
+    matches = re.search(r'(\d+)([a-z]+)', value)
+    if matches:
+        v, unit = matches.group(1, 2)
+        return hgt_map[unit](v)
     else:
         return False
+
+
+validate_map = {'byr': valid_byr,
+                'iyr': valid_iyr,
+                'eyr': valid_eyr,
+                'hgt': valid_hgt,
+                'hcl': valid_hcl,
+                'ecl': valid_ecl,
+                'pid': valid_pid
+                }
 
 
 def validate_values(passport):
@@ -37,85 +66,46 @@ def validate_values(passport):
     for k, v in passport.items():
         if not result:
             break
-        if k == 'byr':
-            result = 1920 <= int(v) <= 2002
-        elif k == 'iyr':
-            result = 2010 <= int(v) <= 2020
-        elif k == 'eyr':
-            result = 2020 <= int(v) <= 2030
-        elif k == 'hgt':
-            pattern = r'(\d+)([a-z]+)'
-            matches = re.search(pattern, v)
-            if not matches:
-                result = False
-            else:
-                if matches.group(2) == 'cm':
-                    result = 150 <= int(matches.group(1)) <= 193
-                elif matches.group(2) == 'in':
-                    result = 59 <= int(matches.group(1)) <= 76
-                else:
-                    result = False
-        elif k == 'hcl':
-            pattern = r'#([0-9]|[a-f]){6}'
-            matches = re.match(pattern, v)
-            if not matches:
-                result = False
-            elif matches.group(1):
-                result = True
-            else:
-                result = False
-        elif k == 'ecl':
-            pattern = r'(amb|blu|brn|gry|grn|hzl|oth)'
-            matches = re.match(pattern, v)
-            if not matches:
-                result = False
-            elif matches.group(1):
-                result = True
-            else:
-                result = False
-        elif k == 'pid':
-            pattern = r'^(\d){9}$'
-            matches = re.match(pattern, v)
-            if not matches:
-                result = False
-            elif matches.group(1):
-                result = True
-            else:
-                result = False
+        if k in validate_map:
+            result = validate_map[k](v)
     return result
 
 
-def run(lines):
-    count = 0
-    new_lines = to_single_line(lines)
-    passports = [parse_passport(line) for line in new_lines]
-    for passport in passports:
-        if validate_passport(passport):
-            count += 1
-    return count
+def validate2(passport):
+    return validate_passport(passport) and validate_values(passport)
+
+
+def run(lines, validation_func=validate_passport):
+    return len([passport for passport in [parse_passport(line) for line in to_passports(
+        lines)] if validation_func(passport)])
 
 
 def part1():
     print(run(read_input()))
 
 
-def run2(lines):
-    count = 0
-    new_lines = to_single_line(lines)
-    passports = [parse_passport(line) for line in new_lines]
-    for passport in passports:
-        if validate_passport(passport) and validate_values(passport):
-            count += 1
-    return count
-
-
 def part2():
-    print(run2(read_input()))
+    print(run(read_input(), validate2))
 
 
 def read_input():
     with open('../inputs/input04') as input:
-        return [i.rstrip() for i in input]
+        return input.read()
+
+
+test_input = """ecl:gry pid:860033327 eyr:2020 hcl:#fffffd
+byr:1937 iyr:2017 cid:147 hgt:183cm
+
+iyr:2013 ecl:amb cid:350 eyr:2023 pid:028048884
+hcl:#cfa07d byr:1929
+
+hcl:#ae17e1 iyr:2013
+eyr:2024
+ecl:brn pid:760753108 byr:1931
+hgt:179cm
+
+hcl:#cfa07d eyr:2025 pid:166559648
+iyr:2011 ecl:brn hgt:59in"""
 
 
 class TestPart1(unittest.TestCase):
@@ -136,36 +126,10 @@ class TestPart1(unittest.TestCase):
             ), ref)
 
     def test_to_single_line(self):
-        i = """ecl:gry pid:860033327 eyr:2020 hcl:#fffffd
-byr:1937 iyr:2017 cid:147 hgt:183cm
-
-iyr:2013 ecl:amb cid:350 eyr:2023 pid:028048884
-hcl:#cfa07d byr:1929
-
-hcl:#ae17e1 iyr:2013
-eyr:2024
-ecl:brn pid:760753108 byr:1931
-hgt:179cm
-
-hcl:#cfa07d eyr:2025 pid:166559648
-iyr:2011 ecl:brn hgt:59in"""
-        self.assertEqual(len(to_single_line(i.split('\n'))), 4)
+        self.assertEqual(len(to_passports(test_input)), 4)
 
     def test_validate_password(self):
-        i = """ecl:gry pid:860033327 eyr:2020 hcl:#fffffd
-byr:1937 iyr:2017 cid:147 hgt:183cm
-
-iyr:2013 ecl:amb cid:350 eyr:2023 pid:028048884
-hcl:#cfa07d byr:1929
-
-hcl:#ae17e1 iyr:2013
-eyr:2024
-ecl:brn pid:760753108 byr:1931
-hgt:179cm
-
-hcl:#cfa07d eyr:2025 pid:166559648
-iyr:2011 ecl:brn hgt:59in"""
-        lines = to_single_line(i.split('\n'))
+        lines = to_passports(test_input)
         passports = [parse_passport(line) for line in lines]
         self.assertTrue(validate_passport(passports[0]))
         self.assertFalse(validate_passport(passports[1]))
@@ -173,20 +137,7 @@ iyr:2011 ecl:brn hgt:59in"""
         self.assertFalse(validate_passport(passports[3]))
 
     def test_run(self):
-        i = """ecl:gry pid:860033327 eyr:2020 hcl:#fffffd
-         byr:1937 iyr:2017 cid:147 hgt:183cm
-
-         iyr:2013 ecl:amb cid:350 eyr:2023 pid:028048884
-         hcl:#cfa07d byr:1929
-
-         hcl:#ae17e1 iyr:2013
-         eyr:2024
-         ecl:brn pid:760753108 byr:1931
-         hgt:179cm
-
-         hcl:#cfa07d eyr:2025 pid:166559648
-         iyr:2011 ecl:brn hgt:59in"""
-        lines = i.split('\n')
+        lines = test_input
         self.assertEqual(run(lines), 2)
 
 
