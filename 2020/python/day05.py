@@ -4,53 +4,16 @@ import unittest
 def parse_code(line):
     row = line[:-3]
     column = line[-3:]
-    return (row, column)
-
-
-def upper_half(value):
-    low, up = value
-    return (1+low + ((up-low) >> 1), up)
-    # return (up - (up >> 1), up)
-
-
-def lower_half(value):
-    low, up = value
-    return (low, low + ((up-low) >> 1))
+    return (int(row, 2), int(column, 2))
 
 
 def run(code):
+    code = code.replace('F', '0')
+    code = code.replace('B', '1')
+    code = code.replace('L', '0')
+    code = code.replace('R', '1')
     row, column = parse_code(code)
-    curr_row = (0, 127)
-    last_row = ''
-    for r in row:
-        if r == 'F':
-            curr_row = lower_half(curr_row)
-            last_row = 'F'
-        else:
-            curr_row = upper_half(curr_row)
-            last_row = 'B'
-
-    curr_column = (0, 7)
-    last_column = ''
-    for c in column:
-        if c == 'L':
-            curr_column = lower_half(curr_column)
-            last_column = 'L'
-        else:
-            curr_column = upper_half(curr_column)
-            last_column = 'R'
-
-    r = 0
-    c = 0
-    if last_row == 'F':
-        r = curr_row[0]
-    else:
-        r = curr_row[1]
-    if last_column == 'L':
-        c = curr_column[0]
-    else:
-        c = curr_column[1]
-    return r * 8 + c
+    return row * 8 + column
 
 
 def part1():
@@ -76,14 +39,6 @@ def read_input():
 
 
 class TestPart1(unittest.TestCase):
-    def test_parse_code(self):
-        self.assertEqual(parse_code("FBFBBFFRLR"), ("FBFBBFF", "RLR"))
-
-    def test_halfs(self):
-        self.assertEqual(lower_half((0, 127)), (0, 63))
-        self.assertEqual(lower_half((0, 63)), (0, 31))
-        self.assertEqual(upper_half((0, 127)), (64, 127))
-        self.assertEqual(upper_half((0, 63)), (32, 63))
 
     def test_run(self):
         self.assertEqual(run('FBFBBFFRLR'), 357)
