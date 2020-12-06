@@ -9,11 +9,9 @@ def parse(input: str):
 def run(all_answers):
     count = 0
     for answers in all_answers:
-        unique_answers = set()
         answers = "".join(answers).replace(' ', '')
-        for answer in answers:
-            unique_answers.add(answer)
-        count += len(unique_answers)
+        unique_keys = [set(l) for l in answers]
+        count += len(unique_keys[0].union(*unique_keys[1:]))
     return count
 
 
@@ -25,7 +23,6 @@ def run2(all_answers):
     count = 0
     for answers in all_answers:
         people_answers = answers.split(' ')
-        people = len(people_answers)
         unique_keys = [set(l) for l in people_answers]
         count += len(unique_keys[0].intersection(*unique_keys[1:]))
 
