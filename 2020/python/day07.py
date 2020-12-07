@@ -7,6 +7,9 @@ class Bag:
         self.name = name
         self.deps = {}
 
+    def __repr__(self):
+        return self.name + ' ' + str(self.deps)
+
 
 def parse(line: str):
     multi_p = r'(?P<count>\d)?(?P<bag>([a-z]|\s)+) (bags|bag)'
@@ -42,13 +45,12 @@ def part1():
     matching_bags = set()
 
     while len(queue) > 0:
-        search_bag = queue[0]
+        search_bag = queue.pop(0)
         for bag in bags:
             for dep in bag.deps:
                 if search_bag == dep:
                     queue.append(bag.name)
                     matching_bags.add(bag.name)
-        queue.remove(search_bag)
     print(len(matching_bags))
 
 
