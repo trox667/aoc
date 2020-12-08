@@ -1,4 +1,5 @@
 import unittest
+import copy
 
 
 def parse(line):
@@ -37,21 +38,41 @@ def part1():
     print(run(read_input()))
 
 
-def terminate_ok(op, program, index):
-    if program[index] == op:
-        True
+def terminate_ok(idx, program):
+    if idx >= len(program):
+        return True
     else:
-        False
+        return False
 
 
 def run2(lines):
     program = [parse(line) for line in lines]
-    idx = 0
-    acc = 0
+    for pointer in range(0, len(program)):
+        curr_program = copy.deepcopy(program)
+        op, v = curr_program[pointer]
+        if 'nop' in op:
+            curr_program[pointer] = ('jmp', v)
+        elif 'jmp' in op:
+            curr_program[pointer] = ('nop', v)
+
+        visited_jumped = set()
+        idx = 0
+        acc = 0
+        while True:
+            if 'jmp' in curr_program[idx]:
+                if idx in visited_jumped:
+                    break
+                else:
+                    visited_jumped.add(idx)
+            (i, a) = step(curr_program, idx, acc)
+            idx = i
+            acc = a
+            if terminate_ok(idx, curr_program):
+                return acc
 
 
 def part2():
-    pass
+    print(run2(read_input()))
 
 
 def read_input():
@@ -97,10 +118,10 @@ class TestPart1(unittest.TestCase):
 
 class TestPart2(unittest.TestCase):
     def test_run2(self):
-        pass
+        self.assertEqual(run2(test_input.split('\n')), 8)
 
 
 if __name__ == '__main__':
-    # run(test_input.split('\n'))
     part1()
+    part2()
     unittest.main()
