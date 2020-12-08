@@ -2,82 +2,74 @@ import unittest
 import copy
 
 
+def read_input():
+    with open('../inputs/input08') as input:
+        return input.readlines()
+
+
 def parse(line):
-    op, count = line.strip().split(' ')
-    count = int(count)
-    return (op, count)
+    tokens = line.strip().split(' ')
+    return (tokens[0], int(tokens[1]))
 
 
-def step(program, idx, acc):
-    (op, count) = program[idx]
+def step(instructions, pointer, acc):
+    (op, count) = instructions[pointer]
     if op == 'acc':
-        acc += count
-        idx += 1
+        return (pointer + 1, acc + count)
     elif op == 'jmp':
-        idx += count
+        return (pointer + count, acc)
     else:
-        idx += 1
-    return (idx, acc)
+        return (pointer + 1, acc)
 
 
-def run(lines):
-    visited = set()
-    program = [parse(line) for line in lines]
-    idx = 0
-    acc = 0
-    while True:
-        if idx in visited:
-            return acc
-        visited.add(idx)
-        (i, a) = step(program, idx, acc)
-        idx = i
-        acc = a
-
-
-def part1():
-    print(run(read_input()))
-
-
-def terminate_ok(idx, program):
-    if idx >= len(program):
+def outofbounds(pointer, instructions):
+    if pointer >= len(instructions):
         return True
     else:
         return False
 
 
-def run2(lines):
-    program = [parse(line) for line in lines]
-    for pointer in range(0, len(program)):
-        curr_program = copy.deepcopy(program)
-        op, v = curr_program[pointer]
-        if 'nop' in op:
-            curr_program[pointer] = ('jmp', v)
-        elif 'jmp' in op:
-            curr_program[pointer] = ('nop', v)
+def run(instructions):
+    visited = set()
+    pointer = 0
+    acc = 0
+    while True:
+        if pointer in visited:
+            return ('infinite', acc)
+        visited.add(pointer)
+        (p, a) = step(instructions, pointer, acc)
+        pointer = p
+        acc = a
+        if outofbounds(pointer, instructions):
+            return ('finished', acc)
 
-        visited_jumped = set()
-        idx = 0
-        acc = 0
-        while True:
-            if 'jmp' in curr_program[idx]:
-                if idx in visited_jumped:
-                    break
-                else:
-                    visited_jumped.add(idx)
-            (i, a) = step(curr_program, idx, acc)
-            idx = i
-            acc = a
-            if terminate_ok(idx, curr_program):
-                return acc
+
+def part1():
+    (state, acc) = run([parse(line) for line in read_input()])
+    assert (state == 'infinite')
+    print(acc)
+
+
+def replace_op(pointer, instructions):
+    op, v = instructions[pointer]
+    if 'nop' in op:
+        instructions[pointer] = ('jmp', v)
+    elif 'jmp' in op:
+        instructions[pointer] = ('nop', v)
+
+
+def run2(lines):
+    instructions = [parse(line) for line in lines]
+    for pointer in range(0, len(instructions)):
+        curr_instructions = copy.deepcopy(instructions)
+        replace_op(pointer, curr_instructions)
+        (state, acc) = run(curr_instructions)
+        if state == 'finished':
+            return acc
 
 
 def part2():
     print(run2(read_input()))
-
-
-def read_input():
-    with open('../inputs/input08') as input:
-        return input.readlines()
 
 
 test_input = '''nop +0
@@ -98,22 +90,23 @@ class TestPart1(unittest.TestCase):
         self.assertEqual(parse(test_input.split('\n')[2]), ('jmp', 4))
 
     def test_step(self):
-        program = [parse(line) for line in test_input.split('\n')]
+        instructions = [parse(line) for line in test_input.split('\n')]
         idx = 0
         acc = 0
-        self.assertEqual(step(program, idx, acc), (1, 0))
+        self.assertEqual(step(instructions, idx, acc), (1, 0))
         idx = 1
         acc = 0
-        self.assertEqual(step(program, idx, acc), (2, 1))
+        self.assertEqual(step(instructions, idx, acc), (2, 1))
         idx = 2
         acc = 1
-        self.assertEqual(step(program, idx, acc), (6, 1))
+        self.assertEqual(step(instructions, idx, acc), (6, 1))
         idx = 6
         acc = 1
-        self.assertEqual(step(program, idx, acc), (7, 2))
+        self.assertEqual(step(instructions, idx, acc), (7, 2))
 
     def test_run(self):
-        self.assertEqual(run(test_input.split('\n')), 5)
+        self.assertEqual(run([parse(line) for line in test_input.split('\n')]),
+                         ('infinite', 5))
 
 
 class TestPart2(unittest.TestCase):
