@@ -4,12 +4,16 @@ fn main() {
 }
 
 fn read_input() -> &'static str {
-    include_str!("../../inputs/inputXX")
+    include_str!("../../inputs/input07")
 }
 
-fn part1() {}
+fn part1() -> usize {
+    0
+}
 
-fn part2() {}
+fn part2() -> usize {
+    0
+}
 
 mod tests {
     use super::*;
