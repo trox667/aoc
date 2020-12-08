@@ -22,11 +22,8 @@ def step(instructions, pointer, acc):
         return (pointer + 1, acc)
 
 
-def outofbounds(pointer, instructions):
-    if pointer >= len(instructions):
-        return True
-    else:
-        return False
+def outofbounds(pointer, size):
+    return pointer >= size
 
 
 def run(instructions):
@@ -40,7 +37,7 @@ def run(instructions):
         (p, a) = step(instructions, pointer, acc)
         pointer = p
         acc = a
-        if outofbounds(pointer, instructions):
+        if outofbounds(pointer, len(instructions)):
             return ('finished', acc)
 
 
