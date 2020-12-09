@@ -4,22 +4,18 @@ import itertools
 
 def valid(nums, target):
     combinations = itertools.combinations(nums, 2)
-    return target in [sum(c) for c in combinations]
+    return target in (sum(c) for c in combinations)
 
 
 def run(nums, preamble=5):
     i = 0
-    wrong_nums = list()
-    for i in range(0, len(nums)):
-        if i + preamble + 1 >= len(nums):
-            break
-        n = nums[i:i + preamble]
-        target = nums[i + preamble]
+    for i in range(0, len(nums) - preamble):
+        end = i + preamble
+        n = nums[i:end]
+        target = nums[end]
         if not valid(n, target):
-            wrong_nums.append(target)
-    assert len(wrong_nums) > 0
-    print(wrong_nums)
-    return wrong_nums[0]
+            return target
+    return 0
 
 
 def part1():
@@ -32,6 +28,8 @@ def run2(nums, target):
             s = sum(nums[i:j])
             if s == target:
                 return min(nums[i:j]) + max(nums[i:j])
+            elif s > target:
+                break
 
 
 def part2():
