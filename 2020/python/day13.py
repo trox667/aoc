@@ -2,7 +2,8 @@ import unittest
 
 
 def parse(lines):
-    return (int(lines[0]), [int(d) for d in filter(lambda x: x != 'x', lines[1].split(','))])
+    return (int(lines[0]),
+            [int(d) for d in filter(lambda x: x != 'x', lines[1].split(','))])
 
 
 def run(data):
@@ -29,6 +30,28 @@ def parse2(lines):
     return entries
 
 
+def next_val(a, b, diff, prev=0):
+    start = 1
+    if b < a:
+        start = round(max(a, b) / min(a, b))
+    for x in range(start, 1000000):
+        if (b * x + diff + prev) % a == 0:
+            return b * x + prev
+
+
+def run3(data):
+    prev = 0
+    mul = data[0][1]
+    for i in range(1, len(data)):
+        (sd, sb) = data[i]
+        if (prev + sd) % sb == 0:
+            continue
+        n = next_val(sb, mul, sd, prev)
+        mul *= sb
+        prev = n
+    return n
+
+
 def run2(data):
     # (d, max_bus_id) = data[-1]
     (d, max_bus_id) = max(data, key=lambda x: x[1])
@@ -36,7 +59,7 @@ def run2(data):
     while True:
         all_true = list()
         for (time, bus_id) in data:
-            if (t - (d-time)) % bus_id == 0:
+            if (t - (d - time)) % bus_id == 0:
                 all_true.append(True)
             else:
                 all_true.append(False)
@@ -46,7 +69,7 @@ def run2(data):
 
 
 def part2():
-    print(run2(parse2(read_input())))
+    print(run3(parse2(read_input())))
 
 
 def read_input():
@@ -72,19 +95,20 @@ class TestPart2(unittest.TestCase):
         parse2(test_input.split('\n'))
 
     def test_run2(self):
-        self.assertEqual(run2(parse2(test_input.split('\n'))), 1068781)
+        self.assertEqual(run3(parse2(test_input.split('\n'))), 1068781)
         test_input2 = """1
 17,x,13,19"""
-        self.assertEqual(run2(parse2(test_input2.split('\n'))), 3417)
+        self.assertEqual(run3(parse2(test_input2.split('\n'))), 3417)
         test_input2 = """1
 67,7,59,61"""
-        self.assertEqual(run2(parse2(test_input2.split('\n'))), 754018)
+        self.assertEqual(run3(parse2(test_input2.split('\n'))), 754018)
         test_input2 = """1
 1789,37,47,1889"""
-        self.assertEqual(run2(parse2(test_input2.split('\n'))), 1202161486)
+        self.assertEqual(run3(parse2(test_input2.split('\n'))), 1202161486)
 
 
 if __name__ == '__main__':
     part1()
-    # part2()
+    part2()
     unittest.main()
+    # run3(parse2(test_input.split('\n')))
