@@ -7,6 +7,7 @@ version = "0.1.0"
 [dependencies]
 combinations = "*"
 regex = "*"
+fnv = "*"
 
 [[bin]]
 name = "day01"
@@ -51,3 +52,7 @@ path = "src/day10.rs"
 [[bin]]
 name = "day11"
 path = "src/day11.rs"
+
+[[bin]]
+name = "day15"
+path = "src/day15.rs"
