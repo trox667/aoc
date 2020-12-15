@@ -4,23 +4,22 @@ import collections
 
 def run(L, n=2020):
     turn = 1
-    memory = collections.defaultdict(list)
+    memory = collections.defaultdict(lambda: (0, 0))
 
     for l in L:
-        # print(turn, l)
-        memory[l].append(turn)
+        memory[l] = (turn, 0)
         turn += 1
 
     last = L[-1]
     while turn <= n:
-        if len(memory[last]) == 1:
-            memory[0].append(turn)
-            last = 0
+        if memory[last][1] != 0:
+            (pre, prepre) = memory[last]
+            last = pre - prepre
         else:
-            diff = memory[last][-1] - memory[last][-2]
-            memory[diff].append(turn)
-            last = diff
-        # print(turn, last)
+            last = 0
+
+        (pre, prepre) = memory[last]
+        memory[last] = (turn, pre)
         turn += 1
 
     return last
@@ -28,10 +27,6 @@ def run(L, n=2020):
 
 def part1():
     print(run(read_input()))
-
-
-def run2():
-    pass
 
 
 def part2():
@@ -67,4 +62,4 @@ class TestPart2(unittest.TestCase):
 if __name__ == '__main__':
     part1()
     part2()
-    # unittest.main()
+    unittest.main()
