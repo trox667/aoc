@@ -96,7 +96,7 @@ namespace day3 {
         return false;
     }
 
-    std::vector<int>
+    [[nodiscard]] std::vector<int>
     filter(int index, int value, const std::vector<int> &binary_numbers) {
         std::vector<int> result(binary_numbers.size());
         auto it = std::copy_if(binary_numbers.cbegin(), binary_numbers.cend(),
