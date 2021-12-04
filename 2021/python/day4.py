@@ -84,15 +84,13 @@ class Game:
 
 def part1():
     numbers, board_input = file_to_input()
-    game = Game(numbers, get_board_input(board_input))
-    return game.run()
+    return Game(numbers, get_board_input(board_input)).run()
 
 
 def part2():
     numbers, board_input = file_to_input()
     boards = get_board_input(board_input)
-    game = Game(numbers, boards)
-    return game.run(False)
+    return Game(numbers, boards).run(False)
 
 
 print(part1())
