@@ -4,11 +4,8 @@
 
 #include "day_9.hpp"
 #include <set>
-#include <numeric>
 
 namespace day9 {
-
-
     [[nodiscard]] std::vector<int>
     heightmap_from_file(const std::vector<std::string> &lines) {
         auto heightmap = std::vector<int>{};
@@ -78,7 +75,6 @@ namespace day9 {
             }
         }
     }
-
 
     [[nodiscard]] long part1(const std::vector<std::string> &lines) {
         auto width = lines[0].size();
