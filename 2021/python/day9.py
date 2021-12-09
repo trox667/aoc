@@ -1,10 +1,4 @@
-import sys
-
-test = """2199943210
-3987894921
-9856789892
-8767896789
-9899965678"""
+from functools import reduce
 
 
 def load_file():
@@ -13,7 +7,6 @@ def load_file():
 
 
 def heightmap_from_file():
-    # file_input = test
     file_input = load_file()
     return [int(c) for line in file_input.splitlines() for c in line], len(
         file_input.splitlines()[0])
@@ -27,88 +20,68 @@ def position(idx, width):
     return idx % width, idx // width
 
 
-def walk_map(heightmap, width):
+def neighbors(x, y, width, height):
+    n = []
+    if x - 1 >= 0:
+        n.append(index(x - 1, y, width))
+    if x + 1 < width:
+        n.append(index(x + 1, y, width))
+    if y - 1 >= 0:
+        n.append(index(x, y - 1, width))
+    if y + 1 < height:
+        n.append(index(x, y + 1, width))
+    return n
+
+
+def get_low_points(heightmap, total_width):
     marked = set()
-    h = len(heightmap) // width
+    total_height = len(heightmap) // total_width
     for i in range(0, len(heightmap)):
-        x, y = position(i, width)
+        x, y = position(i, total_width)
         height = heightmap[i]
         if height == 9:
             continue
 
-        neighbors = []
-        if x - 1 >= 0:
-            neighbors.append(index(x - 1, y, width))
-        if x + 1 < width:
-            neighbors.append(index(x + 1, y, width))
-        if y - 1 >= 0:
-            neighbors.append(index(x, y - 1, width))
-        if y + 1 < h:
-            neighbors.append(index(x, y + 1, width))
-
-        mn = sys.maxsize
-        for n in neighbors:
-            mn = min(heightmap[n], mn)
-
-        if height < mn:
+        if height < min(
+                [heightmap[n] for n in neighbors(x, y, total_width, total_height)]):
             marked.add(i)
 
     return marked
 
 
-def walk_map2(idx, heightmap, width, h, visited):
-    x, y = position(idx, width)
+def get_basin(idx, heightmap, total_width, total_height, basin, visited):
+    visited.add(idx)
+    x, y = position(idx, total_width)
     height = heightmap[idx]
     if height == 9:
         return
 
-    visited.add(idx)
+    basin.add(idx)
 
-    neighbors = []
-    if x - 1 >= 0:
-        neighbors.append(index(x - 1, y, width))
-    if x + 1 < width:
-        neighbors.append(index(x + 1, y, width))
-    if y - 1 >= 0:
-        neighbors.append(index(x, y - 1, width))
-    if y + 1 < h:
-        neighbors.append(index(x, y + 1, width))
-
-    for n in neighbors:
+    for n in neighbors(x, y, total_width, total_height):
         if n not in visited and heightmap[n] != 9:
-            walk_map2(n, heightmap, width, h, visited)
-
-    pass
+            get_basin(n, heightmap, total_width, total_height, basin, visited)
 
 
 def part1():
     heightmap, width = heightmap_from_file()
-    marked = walk_map(heightmap, width)
-    sum = 0
-    for m in marked:
-        sum += heightmap[m] + 1
-    return sum
+    marked = get_low_points(heightmap, width)
+    return sum([heightmap[m] + 1 for m in marked])
 
 
 def part2():
     results = []
     heightmap, width = heightmap_from_file()
     height = len(heightmap) // width
-    for idx in range(0, len(heightmap)):
-        visited = set()
-        walk_map2(idx, heightmap, width, height, visited)
-        tmp = []
-        for v in visited:
-            tmp.append(heightmap[v])
-        if tmp not in results:
-            results.append(tmp)
+    visited = set()
+    for idx in get_low_points(heightmap, width):
+        basin = set()
+        get_basin(idx, heightmap, width, height, basin, visited)
+        results.append(basin)
 
     results.sort(key=len)
-    sum = 1
-    for r in results[-3:]:
-        sum *= len(r)
-        print(r, len(r))
-    print(sum)
+    return reduce(lambda a, b: a * b, [len(r) for r in results[-3:]], 1)
+
 
 print(part1())
 print(part2())
