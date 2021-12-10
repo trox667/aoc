@@ -77,7 +77,6 @@ namespace day10 {
             if (points > 0) result.emplace_back(points);
         }
         std::sort(result.begin(), result.end());
-        return result[result.size() / 2];
+        return result[std::midpoint(0, static_cast<int>(result.size()))];
     }
-
 }
