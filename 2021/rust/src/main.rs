@@ -1,13 +1,19 @@
 use std::fs;
 
+mod day10;
 mod day4;
 mod day7;
 mod day9;
 
 #[allow(dead_code)]
 fn read_file(file_path: &str) -> Vec<String> {
-    let contents = fs::read_to_string(file_path).expect(format!("Could not open file. {}", file_path).as_str());
-    contents.lines().filter(|line| { !line.is_empty() }).map(|line| { String::from(line) }).collect()
+    let contents = fs::read_to_string(file_path)
+        .expect(format!("Could not open file. {}", file_path).as_str());
+    contents
+        .lines()
+        .filter(|line| !line.is_empty())
+        .map(|line| String::from(line))
+        .collect()
 }
 
 fn main() {
@@ -25,5 +31,10 @@ fn main() {
         let lines = read_file("../inputs/input09");
         println!("Day 9 - Part1: {}", day9::part1(&lines));
         println!("Day 9 - Part2: {}", day9::part2(&lines));
+    }
+    {
+        let lines = read_file("../inputs/input10");
+        println!("Day 10 - Part1: {}", day10::part1(&lines));
+        println!("Day 10 - Part2: {}", day10::part2(&lines));
     }
 }
