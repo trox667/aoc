@@ -6,11 +6,13 @@
 
 #include <string>
 #include <vector>
+#include <cctype>
+#include <algorithm>
 
 namespace utils {
 
     [[nodiscard]] inline auto split(const std::string &line, char delimiter) {
-        std::vector <std::string> tokens{};
+        std::vector<std::string> tokens{};
         std::string tmp{};
         for (const auto &c: line) {
             if (c == delimiter || c == '\n') {
@@ -32,6 +34,11 @@ namespace utils {
             result += c;
         }
         return result;
+    }
+
+    [[nodiscard]] inline bool is_lower(const std::string &token) {
+        return std::ranges::all_of(begin(token), end(token),
+                            [](const auto &c) { return std::islower(c); });
     }
 }
 
