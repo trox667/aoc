@@ -2,6 +2,7 @@ use std::fs;
 
 mod day10;
 mod day11;
+mod day12;
 mod day4;
 mod day7;
 mod day9;
@@ -42,5 +43,10 @@ fn main() {
         let lines = read_file("../inputs/input11");
         println!("Day 11 - Part1: {}", day11::part1(&lines));
         println!("Day 11 - Part2: {}", day11::part2(&lines));
+    }
+    {
+        let lines = read_file("../inputs/input12");
+        println!("Day 12 - Part1: {}", day12::part1(&lines));
+        println!("Day 12 - Part2: {}", day12::part2(&lines));
     }
 }
