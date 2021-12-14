@@ -25,26 +25,28 @@ def init(polymer):
     return pairs_counter
 
 
-def next(pairs_counter, rules):
+def next_step(pairs_counter, rules):
     new_pairs_counter = defaultdict(int)
-    for pair, count in pairs_counter.items():
+    for pair, c in pairs_counter.items():
         for combination in rules.get(pair):
-            new_pairs_counter[combination] += count
+            new_pairs_counter[combination] += c
     return new_pairs_counter
 
 
 def count(pairs_counter, last_element):
     element_counter = defaultdict(int)
-    for pair, count in pairs_counter.items():
-        element_counter[pair[0]] += count
+    for pair, c in pairs_counter.items():
+        # take only the first char, because of repeating pairs...
+        element_counter[pair[0]] += c
+    # append the very last element because we took only the first one before
     element_counter[last_element[-1]] += 1
 
     min_count, max_count = sys.maxsize, 0
-    for element, count in element_counter.items():
-        if count < min_count:
-            min_count = count
-        elif count > max_count:
-            max_count = count
+    for element, c in element_counter.items():
+        if c < min_count:
+            min_count = c
+        elif c > max_count:
+            max_count = c
     return max_count - min_count
 
 
@@ -52,7 +54,7 @@ def run(steps):
     polymer, rules = get_start_rules()
     pairs_counter = init(polymer)
     for _ in range(steps):
-        pairs_counter = next(pairs_counter, rules)
+        pairs_counter = next_step(pairs_counter, rules)
     return count(pairs_counter, polymer[-1])
 
 
