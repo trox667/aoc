@@ -4,6 +4,7 @@ mod day10;
 mod day11;
 mod day12;
 mod day13;
+mod day14;
 mod day4;
 mod day7;
 mod day9;
@@ -54,5 +55,10 @@ fn main() {
         let lines = read_file("../inputs/input13");
         println!("Day 13 - Part1: {}", day13::part1(&lines));
         println!("Day 13 - Part2: {}", day13::part2(&lines));
+    }
+    {
+        let lines = read_file("../inputs/input14");
+        println!("Day 14 - Part1: {}", day14::part1(&lines));
+        println!("Day 14 - Part2: {}", day14::part2(&lines));
     }
 }
