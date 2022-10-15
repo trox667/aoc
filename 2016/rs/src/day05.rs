@@ -1,4 +1,6 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
+use std::sync::mpsc;
+use std::thread;
 
 fn part1() {
     let input = "abbhdwsy";
@@ -20,6 +22,52 @@ fn part1() {
     }
 
     println!("Part 1: {}", result.join(""));
+}
+
+fn part1_mt() {
+    let input = "abbhdwsy";
+
+    let thread_count = 100;
+    let max = 100_000_000;
+
+    let (tx, rx) = mpsc::channel();
+    let range = max / thread_count;
+
+    let _threads: Vec<_> = (0..thread_count)
+        .map(|i| {
+            let tx = tx.clone();
+            thread::spawn(move || {
+                let mut result = vec![];
+
+                let start = i * range;
+                let end = (i + 1) * range - 1;
+                for index in start..end {
+                    let digest = md5::compute(format!("{}{}", input, index));
+                    let hash = format!("{:x}", digest);
+                    if hash.starts_with("00000") {
+                        let token = hash.chars().nth(5).unwrap();
+                        result.push(token.to_string());
+                    }
+                }
+                tx.send((i, result)).unwrap();
+            })
+        })
+        .collect();
+
+    // close the threads as soon as all transmissions finished
+    drop(tx);
+
+    let mut thread_result = vec![];
+    for received in rx {
+        thread_result.push(received);
+        // println!("Got {:?}", received);
+    }
+
+    let mut tmp = thread_result
+        .iter()
+        .filter(|(_, data)| !data.is_empty())
+        .collect::<Vec<_>>();
+    tmp.sort_by(|(id1, _), (id2, _)| id1.partial_cmp(id2).unwrap());
 }
 
 fn part2() {
@@ -62,5 +110,7 @@ fn part2() {
 
 fn main() {
     // part1();
-    part2();
+    // part2();
+
+    part1_mt();
 }
