@@ -77,4 +77,4 @@ class Part1(unittest.TestCase):
 if __name__ == '__main__':
     part1()
     part2()
-    unittest.main()
+    # unittest.main()

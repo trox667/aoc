@@ -23,6 +23,7 @@ export function createBufferInit(
 export async function part1(
   input,
 ) {
+  const t0 = performance.now();
   const adapter = await navigator.gpu.requestAdapter({
     powerPreference: "high-performance",
   });
@@ -164,7 +165,6 @@ export async function part1(
     0,
     outputArrayBuffer.byteLength,
   );
-  const t0 = performance.now();
   device.queue.submit([encoder.finish()]);
 
   await stagingBuffer.mapAsync(GPUMapMode.READ);

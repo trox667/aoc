@@ -1,7 +1,8 @@
 import re
-
+import time
 
 # Vixen can fly 19 km/s for 7 seconds, but then must rest for 124 seconds.
+
 
 def parse_line(line: str):
     p = re.compile('(\d+)')
@@ -12,6 +13,7 @@ def parse_line(line: str):
 
 
 class Reindeer:
+
     def __init__(self, speed, speed_seconds, rest_seconds):
         self.speed = speed
         self.speed_seconds = speed_seconds
@@ -79,8 +81,10 @@ def test2():
 
 def part1():
     with open('inputs/input14') as file:
-        results = [parse_line(line.strip()) for line in file.readlines() if
-                   line.strip()]
+        results = [
+            parse_line(line.strip()) for line in file.readlines()
+            if line.strip()
+        ]
         reindeers = create_reindeers(results)
         max_distance = 0
         for reindeer in reindeers:
@@ -92,8 +96,10 @@ def part1():
 
 def part2():
     with open('inputs/input14') as file:
-        results = [parse_line(line.strip()) for line in file.readlines() if
-                   line.strip()]
+        results = [
+            parse_line(line.strip()) for line in file.readlines()
+            if line.strip()
+        ]
         reindeers = create_reindeers(results)
         reindeer_distances = {}
 
@@ -120,6 +126,10 @@ def part2():
         print(max_score)
 
 
-# part1()
+now = time.time()
+part1()
+print(f'Part 1 Execution time: {(time.time() - now)*1000}ms')
 # test2()
+now = time.time()
 part2()
+print(f'Part 2 Execution time: {(time.time() - now)*1000}ms')
