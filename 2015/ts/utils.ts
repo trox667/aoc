@@ -1,4 +1,5 @@
 export function readLines(file: string): string[] {
-  const content = Deno.readTextFileSync(file);
-  return content.split("\n");
+  return Deno.readTextFileSync(file).split("\n").filter((line) =>
+    line.length > 0
+  );
 }
