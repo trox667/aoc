@@ -1,9 +1,5 @@
 def run(line, step):
-	for i in range(step, len(line), 1):
-		unique_characters = set(line[i-step:i])
-		if len(unique_characters) == step:
-			return i
-	return 0
+	return [i for i in range(step, len(line), 1) if len(set(line[i-step:i])) == step][0]
 
 with open('../inputs/input6') as f:
 	lines = [line.strip() for line in f.readlines() if len(line) > 0]
