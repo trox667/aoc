@@ -8,7 +8,7 @@ export function run(lines: string[]): number {
     line.split("").map((token) => parseInt(token))
   );
 
-  const visibleGrid = [];
+  const visibleGrid: boolean[][] = [];
   for (let y = 0; y < treeGrid.length; ++y) {
     const row = [];
     for (let x = 0; x < treeGrid[y].length; ++x) {
@@ -17,63 +17,37 @@ export function run(lines: string[]): number {
     visibleGrid.push(row);
   }
 
-  // left to right
+  const mark = (x: number, y: number, max: number): number => {
+    const tree = treeGrid[y][x];
+    const visible = visibleGrid[y][x];
+    if (tree > max) {
+      max = tree;
+      if (!visible) {
+        visibleGrid[y][x] = true;
+      }
+    }
+    return max;
+  };
+
   for (let y = 0; y < treeGrid.length; ++y) {
     let currMax = -1;
     for (let x = 0; x < treeGrid[y].length; ++x) {
-      const tree = treeGrid[y][x];
-      const visible = visibleGrid[y][x];
-      if (tree > currMax) {
-        currMax = tree;
-        if (!visible) {
-          visibleGrid[y][x] = true;
-        }
-      }
+      currMax = mark(x, y, currMax);
     }
-  }
-
-  // right to left
-  for (let y = 0; y < treeGrid.length; ++y) {
-    let currMax = -1;
+    currMax = -1;
     for (let x = treeGrid[y].length - 1; x >= 0; --x) {
-      const tree = treeGrid[y][x];
-      const visible = visibleGrid[y][x];
-      if (tree > currMax) {
-        currMax = tree;
-        if (!visible) {
-          visibleGrid[y][x] = true;
-        }
-      }
+      currMax = mark(x, y, currMax);
     }
   }
 
-  // top to bottom
   for (let x = 0; x < treeGrid[0].length; ++x) {
     let currMax = -1;
     for (let y = 0; y < treeGrid.length; ++y) {
-      const tree = treeGrid[y][x];
-      const visible = visibleGrid[y][x];
-      if (tree > currMax) {
-        currMax = tree;
-        if (!visible) {
-          visibleGrid[y][x] = true;
-        }
-      }
+      currMax = mark(x, y, currMax);
     }
-  }
-
-  // bottom to top
-  for (let x = 0; x < treeGrid[0].length; ++x) {
-    let currMax = -1;
+    currMax = -1;
     for (let y = treeGrid.length - 1; y >= 0; --y) {
-      const tree = treeGrid[y][x];
-      const visible = visibleGrid[y][x];
-      if (tree > currMax) {
-        currMax = tree;
-        if (!visible) {
-          visibleGrid[y][x] = true;
-        }
-      }
+      currMax = mark(x, y, currMax);
     }
   }
 
@@ -106,8 +80,6 @@ export function run2(lines: string[]): number {
 
   for (let y = 0; y < treeGrid.length; ++y) {
     for (let x = 0; x < treeGrid[y].length; ++x) {
-      // const y = 1;
-      // const x = 2;
       const tree = treeGrid[y][x];
 
       let countUp = 0;
@@ -154,7 +126,6 @@ export function run2(lines: string[]): number {
         }
       }
       const score = countUp * countLeft * countRight * countBottom;
-      // console.log(countUp, countLeft, countRight, countBottom);
       result = Math.max(result, score);
     }
   }
