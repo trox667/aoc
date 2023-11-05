@@ -17,9 +17,9 @@ public class TestDay8 {
 
     @Test
     public void part2() {
-        var day8 = new Day8(Path.of("../../inputs/sample8"));
-        assertEquals(day8.part2().toString(), "8");
-//        var day8 = new Day8(Path.of("../../inputs/input8"));
-//        assertEquals(day8.part2().toString(), "313200");
+//        var day8 = new Day8(Path.of("../../inputs/sample8"));
+//        assertEquals(day8.part2().toString(), "8");
+        var day8 = new Day8(Path.of("../../inputs/input8"));
+        assertEquals(day8.part2().toString(), "313200");
     }
 }

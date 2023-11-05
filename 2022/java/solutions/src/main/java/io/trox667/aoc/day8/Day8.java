@@ -28,10 +28,13 @@ public class Day8 extends Day {
     @Override
     public Result part2() {
         try {
-            var input = readInput();
+            var input = readInput().stream().filter(line -> !line.isBlank()).toList();
+            var trees = input.stream().map(line -> Arrays.stream(line.split("")).map(Integer::parseInt).toList()).toList();
+            var map = new Map(trees.size(), trees.get(0).size(), trees);
+            var validator = new BestSpotValidator(map);
+            return new Result(validator.getHighstScenicScore());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return null;
     }
 }
