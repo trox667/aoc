@@ -1,4 +1,3 @@
-import io.trox667.aoc.day7.Day7;
 import io.trox667.aoc.day8.Day8;
 import org.junit.jupiter.api.Test;
 
