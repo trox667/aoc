@@ -1,8 +1,8 @@
 import { Component, Signal } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { Router } from '@angular/router'
-import { TableModule } from 'primeng/table'
 import { ButtonModule } from 'primeng/button'
+import { DataViewModule } from 'primeng/dataview'
 
 import { DayService } from '../day.service'
 import { Day } from '../Day'
@@ -10,7 +10,7 @@ import { Day } from '../Day'
 @Component({
   selector: 'app-day-list',
   standalone: true,
-  imports: [CommonModule, ButtonModule, TableModule],
+  imports: [CommonModule, ButtonModule, DataViewModule],
   templateUrl: './day-list.component.html',
   styleUrl: './day-list.component.css',
 })

@@ -1,6 +1,39 @@
-
-<p-card [header]="'Day ' + day">
-  <p class="m-0">{{day}}</p>
+<p-card [header]="'Tag ' + day">
+  <div class="col-12">
+    <div class="flex flex-column justify-content-start p-1 gap-2">
+      <div
+        class="flex flex-row justify-content-start align-items-center p-1 gap-2"
+      >
+        <p-button>
+          <i class="pi pi-file-export"></i>
+        </p-button>
+        <span> Input </span>
+      </div>
+      <div
+        class="flex flex-row justify-content-start align-items-center p-1 gap-2"
+      >
+        <p-button>
+          <i class="pi pi-play"></i>
+        </p-button>
+        <span>Aufgabe Eins</span>
+      </div>
+      <div
+        class="flex flex-row justify-content-start align-items-center p-1 gap-2"
+      >
+        <p-button>
+          <i class="pi pi-play"></i>
+        </p-button>
+        <span>Aufgabe Zwei</span>
+      </div>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <div class="flex">
+      <p-button
+        label="Zurück"
+        (click)="back()"
+        class="margin-left-auto"
+      ></p-button>
+    </div>
+  </ng-template>
 </p-card>
-
-<p-button label="Back" (click)="back()"></p-button>

@@ -1,30 +1,26 @@
-<p-table [value]="days() || []">
-  <ng-template pTemplate="header">
-    <tr>
-      <th>Day</th>
-      <th>Stars</th>
-    </tr>
-  </ng-template>
-  <ng-template pTemplate="body" let-day>
-    <tr>
-      <td>
-        <p-button [label]="day.day" [link]="true" (click)="openDay(day.day)">
-      </p-button>
-      </td>
-      <td>
-        @if (day.partOne) {
+<p-dataView #dv [value]="days() || []">
+  <ng-template let-day pTemplate="listItem">
+    <div class="col-12">
+      <div class="flex flex-row justify-content-evenly p-4 gap-4">
+        <p-button
+          class="text-2xl font-bold text-900"
+          [label]="day.day"
+          [link]="true"
+          (click)="openDay(day.day)"
+        >
+        </p-button>
+        <div class="text-2xl font-bold text-900">
+          @if (day.partOne) {
           <i class="pi pi-star-fill lr-5"></i>
-        }
-        @else {
-            <i class="pi pi-star lr-5"></i>
-        }
-        @if (day.partTwo) {
+          } @else {
+          <i class="pi pi-star lr-5"></i>
+          } @if (day.partTwo) {
           <i class="pi pi-star-fill lr-5"></i>
-        }
-        @else {
-            <i class="pi pi-star lr-5"></i>
-        }
-      </td>
-    </tr>
+          } @else {
+          <i class="pi pi-star lr-5"></i>
+          }
+        </div>
+      </div>
+    </div>
   </ng-template>
-</p-table>
+</p-dataView>
