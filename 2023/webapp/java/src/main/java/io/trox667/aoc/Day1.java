@@ -9,11 +9,11 @@ public class Day1 extends Day {
 
     @Override
     public <T> T part1() {
-        return null;
+        return (T)"Part 1";
     }
 
     @Override
     public <T> T part2() {
-        return null;
+        return (T)"Part 2";
     }
 }
