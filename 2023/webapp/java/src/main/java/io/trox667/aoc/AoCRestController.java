@@ -1,5 +1,7 @@
 package io.trox667.aoc;
 
+import io.trox667.aoc.persistence.DayItem;
+import io.trox667.aoc.persistence.DayRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,7 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 @RestController
 @RequestMapping("aoc")
@@ -24,6 +28,17 @@ public class AoCRestController {
 
     @Autowired
     ResourceLoader resourceLoader;
+    @Autowired
+    DayRepository dayRepository;
+
+    @GetMapping("/days")
+    public List<DayItem> getDays() {
+        return StreamSupport.stream(this.dayRepository.findAll().spliterator(), false).toList();
+    }
+
+    private Optional<DayItem> getDay(long day) {
+        return this.dayRepository.findById(day);
+    }
 
     @GetMapping(value = {"/solution/{day}", "/solution/{day}/{part}"})
     public Solution solution(@PathVariable("day") int day, @PathVariable("part") Optional<Integer> part) {
@@ -32,9 +47,33 @@ public class AoCRestController {
             var dayClass = Class.forName("io.trox667.aoc.Day" + day);
             Day dayInstance = (Day) dayClass.getDeclaredConstructor(Path.class).newInstance(inputPath);
             if (part.isPresent() && part.get() == 1) {
-                return new Solution(dayInstance.part1(), "");
+                var solution = (String)dayInstance.part1();
+                var dayItem = getDay(day);
+                System.out.println(dayItem);
+                if (dayItem.isPresent()) {
+                    dayItem.get().setPart1(solution);
+                    this.dayRepository.save(dayItem.get());
+                } else {
+                    System.out.println("Creating new day item");
+                    var newDayItem = new DayItem();
+                    newDayItem.setDay(day);
+                    newDayItem.setPart1(solution);
+                    this.dayRepository.save(newDayItem);
+                }
+                return new Solution(solution, "");
             } else if (part.isPresent() && part.get() == 2) {
-                return new Solution(dayInstance.part2(), "");
+                var solution = (String)dayInstance.part2();
+                var dayItem = getDay(day);
+                if (dayItem.isPresent()) {
+                    dayItem.get().setPart2(solution);
+                    this.dayRepository.save(dayItem.get());
+                } else {
+                    var newDayItem = new DayItem();
+                    newDayItem.setDay(day);
+                    newDayItem.setPart2(solution);
+                    this.dayRepository.save(newDayItem);
+                }
+                return new Solution(solution, "");
             }
             return new Solution("", "Could not run Day " + day);
         } catch (Exception e) {

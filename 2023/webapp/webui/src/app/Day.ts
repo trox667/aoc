@@ -1,5 +1,5 @@
 export interface Day {
   day: number
-  partOne: boolean
-  partTwo: boolean
+  partOne: number | undefined
+  partTwo: number | undefined
 }
