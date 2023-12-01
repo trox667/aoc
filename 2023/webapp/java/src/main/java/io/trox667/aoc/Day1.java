@@ -4,54 +4,34 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class Day1 extends Day {
+    private static Map<String, String> digits = Map.of("one", "1", "two", "2", "three", "3", "four", "4", "five", "5", "six", "6", "seven", "7", "eight", "8", "nine", "9");
+
     public Day1(Path path) {
         super(path);
     }
 
-    private String findDigits(String input) {
-        var result = input.replaceAll("[a-zA-Z]", "");
-        return result;
-    }
 
     private boolean isDigit(String input) {
-        try {
-            Integer.parseInt(String.valueOf(input));
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
+        assert input.length() > 0;
+        return Character.isDigit(input.charAt(0));
     }
 
     private String toDigit(String input) {
-        if (input.equals("one")) {
-            return "1";
-        } else if (input.equals("two")) {
-            return "2";
-        } else if (input.equals("three")) {
-            return "3";
-        } else if (input.equals("four")) {
-            return "4";
-        } else if (input.equals("five")) {
-            return "5";
-        } else if (input.equals("six")) {
-            return "6";
-        } else if (input.equals("seven")) {
-            return "7";
-        } else if (input.equals("eight")) {
-            return "8";
-        } else if (input.equals("nine")) {
-            return "9";
-        } else {
-            return null;
-        }
+        return digits.get(input);
     }
 
-    private String findNamedDigits(String input) {
+    private String getDigits(String input) {
+        return Arrays.stream(input.split("")).filter(this::isDigit).reduce("", String::concat);
+    }
+
+    private String getNamedDigits(String input) {
         var result = "";
         for (var start = 0; start < input.length(); start++) {
-            for (var pos = start + 1; pos < start + 7 && pos < input.length()+1; pos++) {
+            // maximum word size is 5, so start + 6 for the substring
+            for (var pos = start + 1; pos < start + 6 && pos < input.length() + 1; pos++) {
                 var token = input.substring(start, pos);
                 if (isDigit(token)) {
                     result += token;
@@ -62,44 +42,41 @@ public class Day1 extends Day {
                 }
             }
         }
-
-
         return result;
     }
 
-    private int getFirstAndLastDigit(String input) {
+    private int getCalibrationValues(String input) {
         List<String> digits = Arrays.asList(input.split(""));
         return Integer.parseInt(digits.getFirst() + digits.getLast());
     }
 
     @Override
-    public <T> T part1() {
+    public Object part1() {
         var result = 0;
         try {
             var input = readInput();
             for (var line : input) {
-                result += getFirstAndLastDigit(findDigits(line));
+                result += getCalibrationValues(getDigits(line));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        return (T) (Integer) result;
+        return result;
     }
 
     @Override
-    public <T> T part2() {
+    public Object part2() {
         var result = 0;
         try {
             var input = readInput();
             for (var line : input) {
-                var tmp = getFirstAndLastDigit(findNamedDigits(line));
-                result += tmp;
+                result += getCalibrationValues(getNamedDigits(line));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        return (T) (Integer) result;
+        return result;
     }
 }

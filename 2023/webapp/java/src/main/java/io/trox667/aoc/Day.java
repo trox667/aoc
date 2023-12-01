@@ -16,6 +16,6 @@ public abstract class Day {
         return Files.readAllLines(path);
     }
 
-    public abstract <T> T part1();
-    public abstract <T> T part2();
+    public abstract Object part1();
+    public abstract Object part2();
 }
