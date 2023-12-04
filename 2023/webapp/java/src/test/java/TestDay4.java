@@ -15,6 +15,6 @@ public class TestDay4 {
     @Test
     public void part2() {
         assertEquals(30, new Day4(Paths.get("../../input/sample04")).part2());
-        assertEquals(0, new Day4(Paths.get("../../input/input04")).part2());
+        assertEquals(5095824, new Day4(Paths.get("../../input/input04")).part2());
     }
 }
