@@ -27,8 +27,8 @@ public class Day5 extends Day {
             for (var line : lines) {
                 if (line.startsWith("seeds: ")) {
                     almanac.seeds = Arrays.stream(line.split(": ")[1].split(" ")).map(Long::parseLong).toList();
-                    for (var i = 0; i < almanac.seeds.size()-1; i+=2) {
-                        almanac.seedRanges.add(new SeedRange(almanac.seeds.get(i), almanac.seeds.get(i+1)));
+                    for (var i = 0; i < almanac.seeds.size() - 1; i += 2) {
+                        almanac.seedRanges.add(new SeedRange(almanac.seeds.get(i), almanac.seeds.get(i + 1)));
                     }
 
                 } else if (!line.isEmpty() && !line.isBlank()) {
@@ -77,7 +77,9 @@ public class Day5 extends Day {
 
     private static record AnyRange(long destination, long source, long range) {
     }
-    private static record SeedRange(long source, long range) {}
+
+    private static record SeedRange(long source, long range) {
+    }
 
     private static class AnyToAnyMap {
         private List<AnyRange> ranges;
@@ -113,19 +115,20 @@ public class Day5 extends Day {
         try {
             var lines = this.readInput();
             var almanac = Almanac.fromStrings(lines);
-            return almanac.getMinLocationForSeeds() ;
+            return almanac.getMinLocationForSeeds();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public Object part2() { try {
-        var lines = this.readInput();
-        var almanac = Almanac.fromStrings(lines);
-        return almanac.getMinLocationForSeedRanges();
-    } catch (IOException e) {
-        throw new RuntimeException(e);
-    }
+    public Object part2() {
+        try {
+            var lines = this.readInput();
+            var almanac = Almanac.fromStrings(lines);
+            return almanac.getMinLocationForSeedRanges();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
