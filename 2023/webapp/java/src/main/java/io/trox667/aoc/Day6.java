@@ -38,9 +38,22 @@ public class Day6 extends Day {
             return raceDocument;
         }
 
+        public long solve() {
+            assert times.size() == distances.size();
+            var result = 1L;
+            for (var i = 0; i < times.size(); i++) {
+                // x * (time - x) > distance
+                // x^2 - time * x > distance
+                var b = times.get(i) / 2.0;
+                var d = Math.sqrt(b * b - distances.get(i));
+                result *= (Math.ceil(b + d - 1L) - Math.floor(b - d + 1L) + 1L);
+            }
+            return result;
+        }
+
         public long getMultipliedNumberOfWaysToBeatTheRecords() {
             assert times.size() == distances.size();
-            var result = 1;
+            var result = 1L;
             for (var i = 0; i < times.size(); i++) {
                 var time = times.get(i);
                 var distance = distances.get(i);
@@ -58,7 +71,8 @@ public class Day6 extends Day {
     public Object part1() {
         try {
             var raceDocument = RaceDocument.fromStrings(readInput());
-            return raceDocument.getMultipliedNumberOfWaysToBeatTheRecords();
+            return raceDocument.solve();
+//            return raceDocument.getMultipliedNumberOfWaysToBeatTheRecords();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -68,7 +82,8 @@ public class Day6 extends Day {
     public Object part2() {
         try {
             var raceDocument = RaceDocument.fromStringsOneRace(readInput());
-            return raceDocument.getMultipliedNumberOfWaysToBeatTheRecords();
+            return raceDocument.solve();
+//            return raceDocument.getMultipliedNumberOfWaysToBeatTheRecords();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
