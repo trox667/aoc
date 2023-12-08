@@ -11,6 +11,11 @@ public final class Node {
         this.distance = distance;
     }
 
+    public Node(String name) {
+        this.name = name;
+        this.distance = 0;
+    }
+
     public String name() {
         return name;
     }
