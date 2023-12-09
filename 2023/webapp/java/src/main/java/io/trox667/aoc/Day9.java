@@ -9,22 +9,10 @@ import java.util.stream.LongStream;
 
 public class Day9 extends Day {
 
-    private static class Values {
-        private List<Long> values;
-
-        public Values(List<Long> values) {
-            this.values = values;
-        }
-
+    private record Values(List<Long> values) {
         public Values differences() {
             var newValues = new ArrayList<Long>();
-
-            for (var i = 0; i < values.size() - 1; i++) {
-                var a = values.get(i + 1);
-                var b = values.get(i);
-                newValues.add(a - b);
-            }
-
+            LongStream.range(0, values.size() - 1).forEach(i -> newValues.add(values.get((int) i + 1) - values.get((int) i)));
             return new Values(newValues);
         }
 
@@ -36,26 +24,10 @@ public class Day9 extends Day {
     private static class HistoryEntry {
         private Values history;
 
-        private HistoryEntry() {
-            this.history = null;
-        }
-
         public static HistoryEntry fromString(String line) {
             var entry = new HistoryEntry();
             entry.history = new Values(Arrays.stream(line.split(" ")).map(Long::parseLong).toList());
             return entry;
-        }
-
-        public Values differences() {
-            var newValues = new ArrayList<Long>();
-
-            for (var i = 0; i < history.values.size() - 1; i++) {
-                var a = history.values.get(i + 1);
-                var b = history.values.get(i);
-                newValues.add(a - b);
-            }
-
-            return new Values(newValues);
         }
     }
 
@@ -82,41 +54,28 @@ public class Day9 extends Day {
         private List<Values> getStepsToZero(HistoryEntry historyEntry) {
             List<Values> steps = new ArrayList<>();
             steps.add(historyEntry.history);
-            steps.add(historyEntry.differences());
+            steps.add(historyEntry.history.differences());
             while (!steps.getLast().isZero()) {
                 steps.add(steps.getLast().differences());
             }
+            steps.removeLast(); // remove the zero values
             return steps;
         }
 
-        public long sumOfExtrapolatedValues() {
-            var sum = 0L;
-            for (var historyEntry : historyEntries) {
+        public long sumOfExtrapolatedValues(boolean beginning) {
+            return historyEntries.stream().map(historyEntry -> {
                 List<Values> steps = getStepsToZero(historyEntry);
-                steps.removeLast(); // remove the zero values
-                var lastValue = 0L;
-                for (var i = steps.size()-1; i >= 0; i--) {
+                var currentValue = 0L;
+                for (var i = steps.size() - 1; i >= 0; i--) {
                     var step = steps.get(i);
-                    lastValue = step.values.getLast() + lastValue;
+                    if (beginning) {
+                        currentValue = step.values.getFirst() - currentValue;
+                    } else {
+                        currentValue = step.values.getLast() + currentValue;
+                    }
                 }
-                sum += lastValue;
-            }
-            return sum;
-        }
-
-        public long sumOfExtrapolatedValuesAtBackwards() {
-            var sum = 0L;
-            for (var historyEntry : historyEntries) {
-                List<Values> steps = getStepsToZero(historyEntry);
-                steps.removeLast(); // remove the zero values
-                var firstValue = 0L;
-                for (var i = steps.size()-1; i >= 0; i--) {
-                    var step = steps.get(i);
-                    firstValue = step.values.getFirst() - firstValue;
-                }
-                sum += firstValue;
-            }
-            return sum;
+                return currentValue;
+            }).reduce(0L, Long::sum);
         }
     }
 
@@ -128,7 +87,7 @@ public class Day9 extends Day {
     public Object part1() {
         try {
             var report = OASISReport.fromStrings(this.readInput());
-            return report.sumOfExtrapolatedValues();
+            return report.sumOfExtrapolatedValues(false);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -138,7 +97,7 @@ public class Day9 extends Day {
     public Object part2() {
         try {
             var report = OASISReport.fromStrings(this.readInput());
-            return report.sumOfExtrapolatedValuesAtBackwards();
+            return report.sumOfExtrapolatedValues(true);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
