@@ -10,20 +10,20 @@ import java.util.stream.Collectors;
 
 public class Day11 extends Day {
 
-    private static record Coordinate(Long x, Long y) {
+    private record Coordinate(Long x, Long y) {
     }
 
-    private static record Galaxy(Long index, Coordinate position) {
+    private record Galaxy(Long index, Coordinate position) {
     }
 
-    private static record GalaxyPair(Galaxy a, Galaxy b) {
+    private record GalaxyPair(Galaxy a, Galaxy b) {
         public Long distance() {
             return MathUtils.manhattanDistance(a.position.x, a.position.y, b.position.x, b.position.y);
         }
     }
 
     private static class Image {
-        private List<Galaxy> galaxies;
+        private final List<Galaxy> galaxies;
 
         private Image() {
             galaxies = new ArrayList<>();
@@ -31,12 +31,9 @@ public class Day11 extends Day {
 
         public static Image fromStrings(List<String> lines, long expand) {
             var image = new Image();
-
-            var rows = lines.stream().filter(line -> !line.isEmpty()).collect(Collectors.toList());
-
+            var rows = lines.stream().filter(line -> !line.isEmpty()).toList();
             var emptyLinesHorizontally = new ArrayList<Integer>();
             var emptyLinesVertically = new ArrayList<Integer>();
-
             // expand space horizontally
             for (var i = 0; i < rows.size(); i++) {
                 if (!rows.get(i).contains("#")) {
@@ -45,14 +42,14 @@ public class Day11 extends Day {
             }
             // expand space vertically
             for (var x = 0; x < rows.get(0).length(); x++) {
-                var isEmpty = true;
+                var columnHasNoGalaxy = true;
                 for (var y = 0; y < rows.size(); y++) {
                     if (rows.get(y).charAt(x) == '#') {
-                        isEmpty = false;
+                        columnHasNoGalaxy = false;
                         break;
                     }
                 }
-                if (isEmpty) {
+                if (columnHasNoGalaxy) {
                     emptyLinesVertically.add(x);
                 }
             }
@@ -63,13 +60,11 @@ public class Day11 extends Day {
                     if (rows.get(y).charAt(x) == '#') {
                         var countSpaceBefore = 0L;
                         var countSpaceAbove = 0L;
-
                         for (var i = 0; i < emptyLinesHorizontally.size(); i++) {
                             if (emptyLinesHorizontally.get(i) < y) {
                                 countSpaceAbove++;
                             }
                         }
-
                         for (var i = 0; i < emptyLinesVertically.size(); i++) {
                             if (emptyLinesVertically.get(i) < x) {
                                 countSpaceBefore++;
@@ -77,8 +72,7 @@ public class Day11 extends Day {
                         }
                         var xInSpace = x + countSpaceBefore * expand - countSpaceBefore;
                         var yInSpace = y + countSpaceAbove * expand - countSpaceAbove;
-                        image.galaxies.add(new Galaxy(index, new Coordinate((long)xInSpace, (long)yInSpace)));
-                        index++;
+                        image.galaxies.add(new Galaxy(index++, new Coordinate((long)xInSpace, (long)yInSpace)));
                     }
                 }
             }
@@ -97,12 +91,7 @@ public class Day11 extends Day {
         }
 
         public Long sumOfShortestPaths() {
-            var sum = 0L;
-            var pairs = getPairs();
-            for (var pair : pairs) {
-               sum += pair.distance();
-            }
-            return sum;
+            return getPairs().stream().map(GalaxyPair::distance).reduce(0L, Long::sum);
         }
     }
 
