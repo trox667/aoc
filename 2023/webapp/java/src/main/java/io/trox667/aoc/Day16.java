@@ -5,6 +5,10 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class Day16 extends Day {
     private enum Direction {
@@ -31,6 +35,12 @@ public class Day16 extends Day {
             memo = new HashSet<>();
         }
 
+        private Contraption(Contraption c) {
+            this.layout = new ArrayList<>(c.layout);
+            this.energizedTiles = new HashSet<>();
+            memo = new HashSet<>();
+        }
+
         public static Contraption fromStrings(List<String> lines) {
             Contraption contraption = new Contraption();
             contraption.layout = lines;
@@ -45,7 +55,6 @@ public class Day16 extends Day {
                 return;
             }
             energizedTiles.add(new Tile(n.x, n.y));
-//            System.out.println(p + " " + n);
 
             var tile = layout.get(n.y).charAt(n.x);
             var direction = Direction.UNKNOWN;
@@ -160,7 +169,6 @@ public class Day16 extends Day {
                 count = Math.max(count, countEnergizedTiles());
                 reset();
             }
-
             return count;
         }
 
@@ -182,6 +190,50 @@ public class Day16 extends Day {
         super(path);
     }
 
+    private int findMostEnergizedStart(List<String> lines) {
+        var contraption = Contraption.fromStrings(lines);
+        var count = Integer.MIN_VALUE;
+        ExecutorService service = Executors.newVirtualThreadPerTaskExecutor();
+        List<Future<Integer>> futures = new ArrayList<>();
+        // TOP to BOTTOM
+        for (var x = 0; x < contraption.layout.get(0).length(); x++) {
+            int finalX = x;
+            futures.add(service.submit(() -> {
+                var c = new Contraption(contraption);
+                c.walk(new Coordinate(finalX, -1), new Coordinate(finalX, 0));
+                return c.countEnergizedTiles();
+            }));
+            futures.add(service.submit(() -> {
+                var c = new Contraption(contraption);
+                c.walk(new Coordinate(finalX, c.layout.size()), new Coordinate(finalX, c.layout.size() - 1));
+                return c.countEnergizedTiles();
+            }));
+        }
+        for (var y = 0; y < contraption.layout.size(); y++) {
+            int finalY = y;
+            futures.add(service.submit(() -> {
+                var c = new Contraption(contraption);
+                c.walk(new Coordinate(-1, finalY), new Coordinate(0, finalY));
+                return c.countEnergizedTiles();
+            }));
+            futures.add(service.submit(() -> {
+                var c = new Contraption(contraption);
+                c.walk(new Coordinate(c.layout.get(0).length(), finalY), new Coordinate(c.layout.get(0).length() - 1, finalY));
+                return c.countEnergizedTiles();
+            }));
+        }
+
+        for (var result : futures) {
+            try {
+                count = Math.max(result.get(), count);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return count;
+    }
+
     @Override
     public Object part1() {
         try {
@@ -196,8 +248,9 @@ public class Day16 extends Day {
     @Override
     public Object part2() {
         try {
-            Contraption contraption = Contraption.fromStrings(this.readInput());
-            return contraption.findMostEnergizedStart();
+//            Contraption contraption = Contraption.fromStrings(this.readInput());
+//            return contraption.findMostEnergizedStart();
+            return findMostEnergizedStart(this.readInput());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

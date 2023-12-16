@@ -33,8 +33,6 @@ public class Day15 extends Day {
     private record Lens(String label, int focalLength) {
     }
 
-    ;
-
     private static class Box {
         private HashMap<String, Integer> labelsToLenses;
         private List<Lens> lenses;
